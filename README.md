@@ -23,6 +23,18 @@ In the following the results for the top 15 cities are displayed. The top graph 
 
 ![](media/animation.gif)
 
+## Notable events
+Next the claim that twitter mentions are indicators for attacks is checked.
+In the plot below the some notable events are as well as the twitter mentions per city is shown.
+It is clear that there is some correlation between events and the number of mentions, although not all features are explained by the events. 
+![](media/timeline.png)
+
+(events take from https://en.wikipedia.org/wiki/2022_Russian_invasion_of_Ukraine and https://en.wikipedia.org/wiki/Timeline_of_the_2022_Russian_invasion_of_Ukraine)
+
+## Further work
+- Refine twitter query: Include negativity to filter attacks
+- Add more notable events
+
 ## Libraries
 This project was created using:
 - geopandas
