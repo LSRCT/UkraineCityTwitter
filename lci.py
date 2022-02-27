@@ -62,6 +62,29 @@ def plot_city_data(citydata, mapfile, ax=None):
         ax.scatter(c.long, c.lat, color="red", s=c.counts[-1], alpha=0.3)
     plt.show()
 
+def plot_key_events(cd_list):
+    # https://en.wikipedia.org/wiki/2022_Russian_invasion_of_Ukraine
+    # https://en.wikipedia.org/wiki/Timeline_of_the_2022_Russian_invasion_of_Ukraine
+    key_events = [
+        [" Inital attacks", datetime(2022, 2, 24, 3, 0, 0)],
+        [" Kyiv attacks", datetime(2022, 2, 25, 4, 0, 0)],
+        [" Kyiv attacks", datetime(2022, 2, 26, 0, 0, 0)],
+        [" Kharkiv pipeline", datetime(2022, 2, 27, 3, 0, 0)],
+    ]
+
+    fig, ax = plt.subplots()
+    # plot activity timeline
+    for cd in cd_list:
+        ax.plot(cd.times[:-1], cd.counts[:-1], label=f"{cd.name}")
+    ax.legend()
+    for e in key_events:
+        ax.axvline(e[1], color="black", linestyle="--")
+        ax.annotate(e[0], (e[1], 12000), fontsize=7)
+    ax.set_ylabel("Number of twitter mentions")
+    plt.title("Twitter mentions and notable events")
+    plt.show()
+
+
 class UpdateCityData:
     def __init__(self, ax, cd_list, mapfile):
         """
@@ -122,11 +145,11 @@ def main():
 
     city_data_list = get_city_data(client, city_json)
 
-    #plot_city_data(city_data_list, ukr_geofile)
+    plot_key_events(city_data_list)
+
     fig, ax = plt.subplots(2, 1, figsize=(8, 10))
     fig.suptitle("Ukrainian city mentions on twitter")
     ucd = UpdateCityData(ax, city_data_list, ukr_geofile)
-    print(len(city_data_list[0].counts))
     anim = FuncAnimation(fig, ucd, frames=range(len(city_data_list[0].counts)), 
                          save_count=len(city_data_list[0].counts), 
                          interval=200, 
