@@ -29,7 +29,7 @@ def get_city_tweets(twtr_client, citydata):
     :param citydata: CityData object to be filled
     """
     # thats ~ when the invasion started, earlier is not significant
-    query_start_time = datetime(2022, 2, 23, 0, 0, 0)
+    query_start_time = datetime(2022, 2, 28, 0, 0, 0)
 
     search_string = f"#Ukraine {citydata.name}"
     response = twtr_client.get_recent_tweets_count(search_string, start_time=query_start_time)
@@ -62,6 +62,14 @@ def plot_city_data(citydata, mapfile, ax=None):
         ax.scatter(c.long, c.lat, color="red", s=c.counts[-1], alpha=0.3)
     plt.show()
 
+def plot_city_timeline(city_data_list):
+    for cd in city_data_list:
+        plt.plot(cd.times, cd.counts, label=f"{cd.name}")
+    plt.legend()
+    myFmt = mdates.DateFormatter('%D %H:%M')
+    plt.gca().get_xaxis().set_major_formatter(myFmt)
+    plt.show()
+
 def plot_key_events(cd_list):
     # https://en.wikipedia.org/wiki/2022_Russian_invasion_of_Ukraine
     # https://en.wikipedia.org/wiki/Timeline_of_the_2022_Russian_invasion_of_Ukraine
@@ -83,6 +91,15 @@ def plot_key_events(cd_list):
     ax.set_ylabel("Number of twitter mentions")
     plt.title("Twitter mentions and notable events")
     plt.show()
+
+
+def write_data_to_file(city_data_list, filename):
+    with open(filename, "w") as f:
+        names = [cd.name for cd in city_data_list]
+        f.write("time;" + ";".join(names) + "\n")
+        for i in range(len(city_data_list[0].times)):
+            f.write(city_data_list[0].times[i].strftime("%Y-%m-%d %H:%M:%S") + ";")
+            f.write(";".join([str(cd.counts[i]) for cd in city_data_list])+"\n")
 
 
 class UpdateCityData:
@@ -144,8 +161,11 @@ def main():
         city_json = city_json[:15]
 
     city_data_list = get_city_data(client, city_json)
-
-    plot_key_events(city_data_list)
+    current_date = datetime.now()
+    write_data_to_file(city_data_list, f"data/{current_date.strftime('%Y-%m-%d')}.csv")
+    
+    plot_city_timeline(city_data_list)
+    #plot_key_events(city_data_list)
 
     fig, ax = plt.subplots(2, 1, figsize=(8, 10))
     fig.suptitle("Ukrainian city mentions on twitter")
@@ -156,7 +176,7 @@ def main():
                          repeat=False) 
 
     plt.tight_layout()
-    anim.save('media/animation.gif', writer='imagemagick')
+    anim.save('media/animation2.gif', writer='imagemagick')
 
 
 if __name__ == "__main__":
